@@ -39,10 +39,11 @@ void getBasicInfo(string& name, char& gender, int& age, double& height)
 	cout << "Please provide your name, gender(f - female /m - male /o - other), age, and height(m)"
 		<< endl
 		<< "Name: ";
-	getline(cin, name); 
+	getline(cin, name);  //QUESTION
 
 	cout << "Gender: ";
 	cin >> gender;
+	//ASK QUESTION ABOUT THIS
 	while (gender != 'f' && gender != 'm' && gender != 'o')
 	{
 		cout << "Invalid gender, please try again: ";
@@ -72,7 +73,7 @@ int getOption()
 	return getInput<int>();
 }
 
-void inputData(double weight[], string exerciseType[], int workoutTime[]) //(Option1) 
+void inputData(double weight[], string exerciseType[], int workoutTime[] , int size) //(Option1) 
 {
 	cout << "Please enter your weight(kg) from today." << endl;
 	cout << "Weight: ";
@@ -80,14 +81,23 @@ void inputData(double weight[], string exerciseType[], int workoutTime[]) //(Opt
 
 	cout << "Please provide the exercise type and elapsed workout time(minutes): " << endl
 		<< "Exercise type: ";
+	cin.ignore(numeric_limits<streamsize>::max(), '\n'); //fixes issue where it skips the next string input
 	string exerciseTypeRecent;
-	getline(cin, exerciseTypeRecent);
+	getline(cin, exerciseTypeRecent); //ASK QUESTION
 
 	cout << "Duration: ";
 	int workoutTimeRecent = getInput<int>();
 
-	//add a way to input all this into their respective arrays
-	
+	for (int i = size - 1; i > 0; i--) { // Pushes data to make room at the front of the array
+		weight[i] = weight[i - 1];
+		exerciseType[i] = exerciseType[i - 1];
+		workoutTime[i] = workoutTime[i - 1];
+	}
+
+	// inserts at the front of the array (To have it easy to print recent to oldest
+	weight[0] = weightRecent;
+	exerciseType[0] = exerciseTypeRecent;
+	workoutTime[0] = workoutTimeRecent;
 
 	cout << "Data Added!" << endl;
 }
@@ -95,7 +105,6 @@ void inputData(double weight[], string exerciseType[], int workoutTime[]) //(Opt
 void printRecentData(string name, char gender, int age, double height, 
 	const double weight[], const string exerciseType[], const int workoutTime[]) //(Option 2)
 {
-	//using values at 0 in the arrays, using the array like a stack??
 	if (weight[0] != 0) {
 		cout << "\t" << name << endl
 			<< gender << ", " << age << ", " << height << " m" << endl;
@@ -129,24 +138,27 @@ void printHistoryData(string name, char gender, int age, double height, const do
 int main()
 {
 	//Variables (reorganize this)
-	const int SIZE = 7;
-	string name = "n/a", exerciseType[SIZE];
+	const int SIZE = 7, OPTION_LIM = 4;
+	string name = "n/a";
 	char gender = 'n';
-	int age = 0, workoutTime[SIZE], input = 0;
-	double height = 0, weight[SIZE];
+	int age = 0, input = 0;
+	double height = 0;
+	string exerciseType[SIZE] = { "yes", "no", "maybe", "not sure", "uhh" , "y", "n"};
+	int  workoutTime[SIZE] = { 1, 2, 3, 4, 5, 6, 7 };
+	double weight[SIZE]= { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0 };
 
+
+	//Main Start!!
 	getBasicInfo(name, gender, age, height);
 	
-	
 	cout << "\nWelcome, " << name << "!" << endl;
-	
 	
 	do {
 		printMenu();
 		input = getOption();
 		switch (input) {
 		case 1:
-			inputData(weight, exerciseType, workoutTime);
+			inputData(weight, exerciseType, workoutTime, SIZE);
 			break;
 		case 2:
 			printRecentData(name, gender, age, height, weight, exerciseType, workoutTime);
@@ -162,7 +174,7 @@ int main()
 			input = getOption();
 		}
 		cout << "\n";
-	} while (input != 4);
+	} while (input != OPTION_LIM);
 
 	return 0;
 }
