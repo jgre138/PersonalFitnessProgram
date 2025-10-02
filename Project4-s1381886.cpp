@@ -34,6 +34,28 @@ D getInput()
 	return value;
 }
 
+char getInput() 
+{
+	char value;
+	cin >> value;
+	while (value != 'f' && value != 'm' && value != 'o' 
+		&& value != 'F' && value != 'M' && value != 'O')
+	{
+		cout << "Invalid gender, please try again: ";
+		cin.clear();
+		cin.ignore(1000, '\n');
+		cin >> value;
+	}
+	return value;
+}
+
+//string getInput()
+//{
+//	string value;
+//	getline(cin, value);
+//	return value;
+//}
+
 void getBasicInfo(string& name, char& gender, int& age, double& height)
 {
 	cout << "Please provide your name, gender(f - female /m - male /o - other), age, and height(m)"
@@ -42,15 +64,7 @@ void getBasicInfo(string& name, char& gender, int& age, double& height)
 	getline(cin, name);  //QUESTION
 
 	cout << "Gender: ";
-	cin >> gender;
-	//ASK QUESTION ABOUT THIS
-	while (gender != 'f' && gender != 'm' && gender != 'o')
-	{
-		cout << "Invalid gender, please try again: ";
-		cin.clear();
-		cin.ignore(1000, '\n');
-		cin >> gender;
-	}
+	gender = getInput<char>();
 
 	cout << "Age: ";
 	age = getInput<int>();
@@ -68,7 +82,7 @@ void printMenu()
 }
 
 
-int getOption()
+int getOption() //check this with prof
 {
 	return getInput<int>();
 }
@@ -124,8 +138,10 @@ void printHistoryData(string name, char gender, int age, double height, const do
 			<< gender << ", " << age << ", " << height << " m" << endl;
 		cout << "Fitness Data (Most recent to oldest): " << endl;
 		for (int i = 0; i < size; i++) {
-			cout << "Weight: " << weight[i] << " kg, BMI: " << weight[i] / (height * height) << "kg/m^2" << endl;
-			cout << "Exercise: " << exerciseType[i] << "(" << workoutTime[i] << " mins)" << endl;
+			if (weight[i] != 0) {
+				cout << "Weight: " << weight[i] << " kg, BMI: " << weight[i] / (height * height) << "kg/m^2" << endl;
+				cout << "Exercise: " << exerciseType[i] << "(" << workoutTime[i] << " mins)" << endl;
+			}
 		}
 	}
 	else {
@@ -133,20 +149,19 @@ void printHistoryData(string name, char gender, int age, double height, const do
 	}
 }
 
-//MAIN
 
+//MAIN
 int main()
 {
-	//Variables (reorganize this)
+	//Variables
 	const int SIZE = 7, OPTION_LIM = 4;
 	string name = "n/a";
 	char gender = 'n';
 	int age = 0, input = 0;
 	double height = 0;
-	string exerciseType[SIZE] = { "yes", "no", "maybe", "not sure", "uhh" , "y", "n"};
-	int  workoutTime[SIZE] = { 1, 2, 3, 4, 5, 6, 7 };
-	double weight[SIZE]= { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0 };
-
+	string exerciseType[SIZE] = { "none", "none", "none", "none", "none", "none", "none" };
+	int  workoutTime[SIZE] = { 0, 0,0,0,0,0,0 };
+	double weight[SIZE] = { 0, 0,0,0,0,0,0 };
 
 	//Main Start!!
 	getBasicInfo(name, gender, age, height);
