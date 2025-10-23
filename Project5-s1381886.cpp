@@ -11,6 +11,8 @@
 	Update (9/25) : Made getNum() generic so that it can work with any number.
 	Upadate (10/3) : Made functions for several aspects of the program. Made all the verification its own 
 	function. Fitness data now can have history.
+	Update (10/23) : Added dynamic arrays to store fitness data. Resizing function to increase array size
+	when needed. Added calculation for change in BMI and total exercise time in history data.
 
 */
 
