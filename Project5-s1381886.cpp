@@ -65,6 +65,17 @@ string getInput()
 	return data;
 }
 
+template <typename T>
+T* resizeArray(T* arr, int oldSize)
+{
+	T* newArr = new T[oldSize + 1];
+	for (int i = 0; i < oldSize; ++i) {
+		newArr[i] = arr[i];
+	}
+	delete[] arr;
+	return newArr;
+}
+
 void getBasicInfo(string& name, char& gender, int& age, double& height)
 {
 	cout << "Please provide your name, gender(f - female /m - male /o - other), age, and height(m)"
@@ -101,8 +112,15 @@ int getOption()
 	return option;
 }
 
-void inputData(double weight[], string exerciseType[], int workoutTime[] , int size) //(Option1) 
+void inputData(double*& weight, string*& exerciseType, int*& workoutTime , int& size) //(Option1) 
 {
+	weight = resizeArray(weight, size);
+	exerciseType = resizeArray(exerciseType, size);
+	workoutTime = resizeArray(workoutTime, size);
+	size++; // since all three will be resized, it will count up one. 
+			//The size is the same for all three arrays.
+
+
 	cout << "Please enter your weight(kg) from today." << endl;
 	cout << "Weight: ";
 	double weightRecent = getInput<double>();
@@ -115,52 +133,44 @@ void inputData(double weight[], string exerciseType[], int workoutTime[] , int s
 	cout << "Duration: ";
 	int workoutTimeRecent = getInput<int>();
 
-	for (int i = size - 1; i > 0; i--) { // Pushes data to make room at the front of the array
-		weight[i] = weight[i - 1];
-		exerciseType[i] = exerciseType[i - 1];
-		workoutTime[i] = workoutTime[i - 1];
-	}
-
-	// inserts at the front of the array (To have it easy to print recent to oldest
-	weight[0] = weightRecent;
-	exerciseType[0] = exerciseTypeRecent;
-	workoutTime[0] = workoutTimeRecent;
+	weight[size - 1] = weightRecent;
+	exerciseType[size - 1] = exerciseTypeRecent;
+	workoutTime[size - 1] = workoutTimeRecent;
 
 	cout << "Data Added!" << endl;
 }
 
 void printRecentData(string name, char gender, int age, double height, 
-	const double weight[], const string exerciseType[], const int workoutTime[]) //(Option 2)
+	double* weight, string* exerciseType, int* workoutTime, int& size) //(Option 2)
 {
-	if (weight[0] != 0) {
+	if (size > 0 && weight[size -1] != 0) {
 		cout << "\t" << name << endl
 			<< gender << ", " << age << ", " << height << " m" << endl;
-		cout << "Weight: " << weight[0] << " kg, BMI: " << weight[0] / (height * height) << "kg/m^2" << endl;
-		cout << "Exercise: " << exerciseType[0] << "(" << workoutTime[0] << " mins)" << endl;
+		cout << "Weight: " << weight[size -1] << " kg, BMI: " << weight[size - 1] / (height * height) << "kg/m^2" << endl;
+		cout << "Exercise: " << exerciseType[size - 1] << "(" << workoutTime[size - 1] << " mins)" << endl;
 	}
 	else {
 		cout << "There is no fitness data to print." << endl;
 	}
 }
 
-void printHistoryData(string name, char gender, int age, double height, const double weight[],
-	const string exerciseType[], const int workoutTime[], int size) // (Option 3)
+void printHistoryData(string name, char gender, int age, double height, double* weight,
+	string* exerciseType, int* workoutTime, int& size) // (Option 3)
 {
-	if (weight[0] != 0) {
+	if (size > 0 && weight[0] != 0) {
 		cout << "\t" << name << endl
 			<< gender << ", " << age << ", " << height << " m" << endl;
 		cout << "Fitness Data (Most recent to oldest): " << endl;
-		int totalTime = 0, counter = 0;
-		for (int i = 0; i < size; i++) {
+		int totalTime = 0;
+		for (int i = size-1; i > 0; i--) {
 			if (weight[i] != 0) {
 				cout << "Weight: " << weight[i] << " kg, BMI: " << weight[i] / (height * height) << "kg/m^2" << endl;
 				cout << "Exercise: " << exerciseType[i] << "(" << workoutTime[i] << " mins)" << endl;
 				totalTime += workoutTime[i];
-				counter++
 			}
 		}
 
-		double diffenceBMI = (weight[counter - 1] / (height * height)) - (weight[0] / (height * height));
+		double diffenceBMI = (weight[size - 1] / (height * height)) - (weight[0] / (height * height));
 		cout << "Change in BMI from oldest entry to most recent entry: "
 			<< diffenceBMI << " kg/m^2" << endl;
 		cout << "Total exercise time: " << totalTime << " mins" << endl;
@@ -175,14 +185,17 @@ void printHistoryData(string name, char gender, int age, double height, const do
 int main()
 {
 	//Variables
-	const int SIZE = 7, OPTION_LIM = 4;
+	const int OPTION_LIM = 4;
+	int size = 0;
 	string name = "n/a";
 	char gender = 'n';
 	int age = 0, input = 0;
 	double height = 0;
-	string exerciseType[SIZE] = { "none", "none", "none", "none", "none", "none", "none" };
-	int  workoutTime[SIZE] = { 0, 0,0,0,0,0,0 };
-	double weight[SIZE] = { 0, 0,0,0,0,0,0 };
+
+	//Dynamic Arrays
+	string* exerciseType = new string[size];
+	int* workoutTime = new int[size];
+	double* weight = new double[size];
 
 	//Main Start!!
 	getBasicInfo(name, gender, age, height);
@@ -194,13 +207,13 @@ int main()
 		input = getOption();
 		switch (input) {
 		case 1:
-			inputData(weight, exerciseType, workoutTime, SIZE);
+			inputData(weight, exerciseType, workoutTime, size);
 			break;
 		case 2:
-			printRecentData(name, gender, age, height, weight, exerciseType, workoutTime);
+			printRecentData(name, gender, age, height, weight, exerciseType, workoutTime, size);
 			break;
 		case 3:
-			printHistoryData(name, gender, age, height, weight, exerciseType, workoutTime, SIZE);
+			printHistoryData(name, gender, age, height, weight, exerciseType, workoutTime, size);
 			break;
 		case 4:
 			cout << "Ending program, Goodbye!" << endl;
