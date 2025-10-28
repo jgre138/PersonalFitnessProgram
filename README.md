@@ -1,7 +1,7 @@
 The most recent version of this project is Project5 file as of Oct 28th
 
 This is the Personal Fitness Application project that I have been working on for all of Fall25 Semester
-This is an application that records your name, age, gender, height, and the day's weight. Given this information, it will calculate your BMI.The user can log the exercise they did for the day and the duration of the workout.
+This is an application that records your name, age, gender, height, and the day's weight. Given this information, it will calculate your BMI. The user can log the exercise they did for the day and the duration of the workout.
 
 Features include:
 -  Creating a user profile
