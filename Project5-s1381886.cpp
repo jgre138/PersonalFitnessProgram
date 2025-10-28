@@ -11,7 +11,7 @@
 	Update (9/25) : Made getNum() generic so that it can work with any number.
 	Upadate (10/3) : Made functions for several aspects of the program. Made all the verification its own 
 	function. Fitness data now can have history.
-	Update (10/23) : Added dynamic arrays to store fitness data. Resizing function to increase array size
+	Update (10/28) : Added dynamic arrays to store fitness data. Resizing function to increase array size
 	when needed. Added calculation for change in BMI and total exercise time in history data.
 
 */
@@ -70,7 +70,7 @@ string getInput()
 template <typename T>
 T* resizeArray(T* arr, int oldSize)
 {
-	T* newArr = new T[oldSize + 1];
+	T* newArr = new T[oldSize * 2];
 	for (int i = 0; i < oldSize; ++i) {
 		newArr[i] = arr[i];
 	}
@@ -114,14 +114,14 @@ int getOption()
 	return option;
 }
 
-void inputData(double*& weight, string*& exerciseType, int*& workoutTime , int& size) //(Option1) 
-{
-	weight = resizeArray(weight, size);
-	exerciseType = resizeArray(exerciseType, size);
-	workoutTime = resizeArray(workoutTime, size);
-	size++; // since all three will be resized, it will count up one. 
-			//The size is the same for all three arrays.
-
+void inputData(double*& weight, string*& exerciseType, int*& workoutTime , int& size, int& counter) //(Option1) 
+{ // start at size 7 then rezise once the array is full
+	if (size == counter) {
+		weight = resizeArray<double>(weight, size);
+		exerciseType = resizeArray(exerciseType, size);
+		workoutTime = resizeArray(workoutTime, size);
+		size *= 2;
+	}
 
 	cout << "Please enter your weight(kg) from today." << endl;
 	cout << "Weight: ";
@@ -135,21 +135,23 @@ void inputData(double*& weight, string*& exerciseType, int*& workoutTime , int& 
 	cout << "Duration: ";
 	int workoutTimeRecent = getInput<int>();
 
-	weight[size - 1] = weightRecent;
-	exerciseType[size - 1] = exerciseTypeRecent;
-	workoutTime[size - 1] = workoutTimeRecent;
+	weight[counter] = weightRecent;
+	exerciseType[counter] = exerciseTypeRecent;
+	workoutTime[counter] = workoutTimeRecent;
+
+	counter++; 
 
 	cout << "Data Added!" << endl;
 }
 
 void printRecentData(string name, char gender, int age, double height, 
-	double* weight, string* exerciseType, int* workoutTime, int& size) //(Option 2)
+	double* weight, string* exerciseType, int* workoutTime, int counter) //(Option 2)
 {
-	if (size > 0 && weight[size -1] != 0) {
+	if (counter > 0 && weight[counter -1] != 0) {
 		cout << "\t" << name << endl
-			<< gender << ", " << age << ", " << height << " m" << endl;
-		cout << "Weight: " << weight[size -1] << " kg, BMI: " << weight[size - 1] / (height * height) << "kg/m^2" << endl;
-		cout << "Exercise: " << exerciseType[size - 1] << "(" << workoutTime[size - 1] << " mins)" << endl;
+			<< gender << ", " << age << ", " << height << "m" << endl;
+		cout << "Weight: " << weight[counter -1] << " kg, BMI: " << weight[counter - 1] / (height * height) << "kg/m^2" << endl;
+		cout << "Exercise: " << exerciseType[counter - 1] << "(" << workoutTime[counter - 1] << " mins)" << endl;
 	}
 	else {
 		cout << "There is no fitness data to print." << endl;
@@ -157,24 +159,32 @@ void printRecentData(string name, char gender, int age, double height,
 }
 
 void printHistoryData(string name, char gender, int age, double height, double* weight,
-	string* exerciseType, int* workoutTime, int& size) // (Option 3)
+	string* exerciseType, int* workoutTime, int counter) // (Option 3)
 {
-	if (size > 0 && weight[0] != 0) {
+	if (counter > 0 && weight[counter - 1] != 0) {
 		cout << "\t" << name << endl
-			<< gender << ", " << age << ", " << height << " m" << endl;
+			<< gender << ", " << age << ", " << height << "m" << endl;
 		cout << "Fitness Data (Most recent to oldest): " << endl;
 		int totalTime = 0;
-		for (int i = size-1; i > 0; i--) {
-			if (weight[i] != 0) {
-				cout << "Weight: " << weight[i] << " kg, BMI: " << weight[i] / (height * height) << "kg/m^2" << endl;
-				cout << "Exercise: " << exerciseType[i] << "(" << workoutTime[i] << " mins)" << endl;
-				totalTime += workoutTime[i];
-			}
+		for (int i = counter -1; i >= 0; i--) {
+			cout << "Weight: " << weight[i] << " kg, BMI: " << weight[i] / (height * height) << "kg/m^2" << endl;
+			cout << "Exercise: " << exerciseType[i] << "(" << workoutTime[i] << " mins)" << endl;
+			totalTime += workoutTime[i];
 		}
 
-		double diffenceBMI = (weight[size - 1] / (height * height)) - (weight[0] / (height * height));
-		cout << "Change in BMI from oldest entry to most recent entry: "
-			<< diffenceBMI << " kg/m^2" << endl;
+		double diffenceBMI; 
+		// this is to keep the number positive depending on if the number is a increase in bmi or decrease
+		if ((weight[counter - 1] / (height * height)) - (weight[0] / (height * height)) > 0) {
+			diffenceBMI = (weight[counter - 1] / (height * height)) - (weight[0] / (height * height));
+			cout << "Change in BMI from oldest entry to most recent entry: "
+				<< diffenceBMI << " kg/m^2 (Increase)" << endl;
+		}
+		else {
+			diffenceBMI = (weight[0] / (height * height)) - (weight[counter -1] / (height * height));
+			cout << "Change in BMI from oldest entry to most recent entry: "
+				<< diffenceBMI << " kg/m^2 (Decrease)" << endl;
+		}
+
 		cout << "Total exercise time: " << totalTime << " mins" << endl;
 	}
 	else {
@@ -188,7 +198,7 @@ int main()
 {
 	//Variables
 	const int OPTION_LIM = 4;
-	int size = 0;
+	int size = 7, counter = 0;
 	string name = "n/a";
 	char gender = 'n';
 	int age = 0, input = 0;
@@ -209,19 +219,18 @@ int main()
 		input = getOption();
 		switch (input) {
 		case 1:
-			inputData(weight, exerciseType, workoutTime, size);
+			inputData(weight, exerciseType, workoutTime, size, counter);
 			break;
 		case 2:
-			printRecentData(name, gender, age, height, weight, exerciseType, workoutTime, size);
+			printRecentData(name, gender, age, height, weight, exerciseType, workoutTime, counter);
 			break;
 		case 3:
-			printHistoryData(name, gender, age, height, weight, exerciseType, workoutTime, size);
+			printHistoryData(name, gender, age, height, weight, exerciseType, workoutTime, counter);
 			break;
 		case 4:
 			cout << "Ending program, Goodbye!" << endl;
 			break;
 		}
-		cout << "\n";
 	} while (input != OPTION_LIM);
 
 	return 0;
