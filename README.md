@@ -1,4 +1,4 @@
-The most recent version of this project is Project5 file as of Oct 28th
+The most recent version of this project is Project6 file as of Oct 29th
 
 This is the Personal Fitness Application project that I have been working on for all of Fall25 Semester
 This is an application that records your name, age, gender, height, and the day's weight. Given this information, it will calculate your BMI. The user can log the exercise they did for the day and the duration of the workout.
@@ -15,5 +15,6 @@ Changelog:
 - Update (9/25) : Made getNum() generic so that it can work with any number.
 - Upadate (10/3) : Made functions for several aspects of the program. Made all the verification its own function. Fitness data now can have history.
 - Update (10/28) : Added dynamic arrays to store fitness data. Resizing function to increase array sizewhen needed. Added calculation for change in BMI and total exercise time in history data.
+- Upadate (10/29) : Changed the method of storing data to creating a structure or "object" for each entry of fittness data. Changed from multiple arrays into one vector using the new structure as the type. Modified all other methods to reflect this change of array to vector.
 
 
