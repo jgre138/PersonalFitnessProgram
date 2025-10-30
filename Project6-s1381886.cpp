@@ -1,5 +1,5 @@
 /*
-	Project 5 by Jennifer Greene
+	Project 6 by Jennifer Greene
 
 	This is a personal fitness application that records your name, age, gender, height, and the day's weight.
 	Given this information, it will calculate your BMI.The user can log the exercise they did for the day 
@@ -12,7 +12,15 @@
 #include <vector>
 using namespace std;
 
-struct FitnessData {
+struct User {
+	string name;
+	char gender;
+	int age;
+	double height;
+	vector<FitnessRecord> fitnessData;
+};
+
+struct FitnessRecord {
 	double weight = 0;
 	string exerciseType;
 	int workoutTime = 0;
@@ -76,21 +84,22 @@ string getInput()
 //	return newArr;
 //}
 
-void getBasicInfo(string& name, char& gender, int& age, double& height)
+void getBasicInfo(User& user)
 {
 	cout << "Please provide your name, gender(f - female /m - male /o - other), age, and height(m)"
 		<< endl
 		<< "Name: ";
-	name = getInput<string>();
+	user.name = getInput<string>();
 
 	cout << "Gender: ";
-	gender = getInput<char>();
+	user.gender = getInput<char>();
 
 	cout << "Age: ";
-	age = getInput<int>();
+	user.age = getInput<int>();
 
 	cout << "Height: ";
-	height = getInput<double>();
+	user.height = getInput<double>();
+
 }
 
 
@@ -112,7 +121,12 @@ int getOption()
 	return option;
 }
 
-void inputData(vector<FitnessData>*& userData , int& size, int& counter) //(Option1) 
+double calculateBMI(double weight, double height) 
+{
+	return weight / (height * height);
+}
+
+void inputData(User user) //(Option1) 
 { 
 
 	cout << "Please enter your weight(kg) from today." << endl;
@@ -128,56 +142,59 @@ void inputData(vector<FitnessData>*& userData , int& size, int& counter) //(Opti
 	int workoutTimeRecent = getInput<int>();
 
 	//new input using an object into an object array
-	FitnessData newEntry;
+	FitnessRecord newEntry;
 	newEntry.weight = weightRecent;
 	newEntry.exerciseType = exerciseTypeRecent;
 	newEntry.workoutTime = workoutTimeRecent;
 
-	userData->push_back(newEntry);
-
-	counter++; 
+	user.fitnessData.push_back(newEntry);
 
 	cout << "Data Added!" << endl;
 }
 
-void printRecentData(string name, char gender, int age, double height, 
-	vector<FitnessData>* userData, int counter) //(Option 2)
+void printRecentData(User& user) //(Option 2)
 {
-	FitnessData userDataRecent = userData->at(counter - 1); //check this line
-	if (counter > 0) {
-		cout << "\t" << name << endl
-			<< gender << ", " << age << ", " << height << "m" << endl;
-		cout << "Weight: " << userDataRecent.weight << " kg, BMI: " << userDataRecent.weight / (height * height) << "kg/m^2" << endl;
-		cout << "Exercise: " << userDataRecent.exerciseType << "(" << userDataRecent.workoutTime << " mins)" << endl;
+	FitnessRecord userDataRecent = user.fitnessData.back();
+	if (user.fitnessData.size() > 0) {
+		cout << "\t" << user.name << endl
+			<< user.gender << ", " << user.age << ", " << user.height << "m" << endl;
+		cout << "Weight: " << userDataRecent.weight << " kg, BMI: " 
+			<< userDataRecent.weight / (user.height * user.height) << "kg/m^2" << endl;
+		cout << "Exercise: " << userDataRecent.exerciseType 
+			<< "(" << userDataRecent.workoutTime << " mins)" << endl;
 	}
 	else {
 		cout << "There is no fitness data to print." << endl;
 	}
 }
 
-void printHistoryData(string name, char gender, int age, double height, vector<FitnessData>* userData, int counter) // (Option 3)
+void printHistoryData(User user) // (Option 3)
 {
-	if (counter > 0) {
-		cout << "\t" << name << endl
-			<< gender << ", " << age << ", " << height << "m" << endl;
+	int size = user.fitnessData.size();
+	if (size > 0) {
+		cout << "\t" << user.name << endl
+			<< user.gender << ", " << user.age << ", " << user.height << "m" << endl;
 		cout << "Fitness Data (Most recent to oldest): " << endl;
 		int totalTime = 0;
-		for (int i = counter -1; i >= 0; i--) {
-			FitnessData currData = userData->at(i);
-			cout << "Weight: " << currData.weight << " kg, BMI: " << currData.weight / (height * height) << "kg/m^2" << endl;
-			cout << "Exercise: " << currData.exerciseType << "(" << currData.workoutTime << " mins)" << endl;
+		for (int i = (size-1); i >= 0; i--) {
+			FitnessRecord currData = user.fitnessData.at(i);
+			cout << "Weight: " << currData.weight 
+				<< " kg, BMI: " << currData.weight / (user.height * user.height) 
+				<< "kg/m^2" << endl;
+			cout << "Exercise: " << currData.exerciseType 
+				<< "(" << currData.workoutTime << " mins)" << endl;
 			totalTime += currData.workoutTime;
 		}
 
 		double diffenceBMI; 
 		// this is to keep the number positive depending on if the number is a increase in bmi or decrease
-		if ((userData->at(counter - 1).weight / (height * height)) - ((userData->at(counter - 1).weight) / (height * height)) > 0) {
-			diffenceBMI = (userData->at(counter - 1).weight / (height * height)) - (userData->at(0).weight / (height * height));
+		if ((calculateBMI(user.fitnessData.back().weight, user.height) - calculateBMI(user.fitnessData.front().weight, user.height)) > 0) {
+			diffenceBMI = calculateBMI(user.fitnessData.back().weight, user.height) - calculateBMI(user.fitnessData.front().weight, user.height);
 			cout << "Change in BMI from oldest entry to most recent entry: "
 				<< diffenceBMI << " kg/m^2 (Increase)" << endl;
 		}
 		else {
-			diffenceBMI = (userData->at(0).weight / (height * height)) - (userData->at(counter - 1).weight / (height * height));
+			diffenceBMI = calculateBMI(user.fitnessData.front().weight, user.height) - calculateBMI(user.fitnessData.back().weight, user.height);
 			cout << "Change in BMI from oldest entry to most recent entry: "
 				<< diffenceBMI << " kg/m^2 (Decrease)" << endl;
 		}
@@ -195,33 +212,30 @@ int main()
 {
 	//Variables
 	const int OPTION_LIM = 4;
-	int size = 7, counter = 0;
-	string name = "n/a";
-	char gender = 'n';
-	int age = 0, input = 0;
-	double height = 0;
+	int input = 0;
 
 
 	//Vector of Fitness Data
-	vector<FitnessData>* userData;
+	vector<FitnessRecord>* userData;
 
 	//Main Start!!
-	getBasicInfo(name, gender, age, height);
+	User newUser;
+	getBasicInfo(newUser);
 	
-	cout << "\nWelcome, " << name << "!" << endl;
+	cout << "\nWelcome, " << newUser.name << "!" << endl;
 	
 	do {
 		printMenu();
 		input = getOption();
 		switch (input) {
 		case 1:
-			inputData(userData, size, counter);
+			inputData(newUser);
 			break;
 		case 2:
-			printRecentData(name, gender, age, height, userData, counter);
+			printRecentData(newUser);
 			break;
 		case 3:
-			printHistoryData(name, gender, age, height, userData, counter);
+			printHistoryData(newUser);
 			break;
 		case 4:
 			cout << "Ending program, Goodbye!" << endl;
