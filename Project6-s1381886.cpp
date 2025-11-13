@@ -12,18 +12,20 @@
 #include <vector>
 using namespace std;
 
+struct FitnessRecord {
+	double weight = 0;
+	string exerciseType;
+	int workoutTime = 0;
+};
+// Current program has compile time error. 
+// FitnessRecord needs to be defined before it is
+// used in the User definition.
 struct User {
 	string name;
 	char gender;
 	int age;
 	double height;
 	vector<FitnessRecord> fitnessData;
-};
-
-struct FitnessRecord {
-	double weight = 0;
-	string exerciseType;
-	int workoutTime = 0;
 };
 
 
@@ -126,7 +128,7 @@ double calculateBMI(double weight, double height)
 	return weight / (height * height);
 }
 
-void inputData(User user) //(Option1) 
+void inputData(User& user) //(Option1) 
 { 
 
 	cout << "Please enter your weight(kg) from today." << endl;
@@ -154,8 +156,8 @@ void inputData(User user) //(Option1)
 
 void printRecentData(User& user) //(Option 2)
 {
-	FitnessRecord userDataRecent = user.fitnessData.back();
 	if (user.fitnessData.size() > 0) {
+	FitnessRecord userDataRecent = user.fitnessData.back();
 		cout << "\t" << user.name << endl
 			<< user.gender << ", " << user.age << ", " << user.height << "m" << endl;
 		cout << "Weight: " << userDataRecent.weight << " kg, BMI: " 
@@ -241,7 +243,7 @@ int main()
 			cout << "Ending program, Goodbye!" << endl;
 			break;
 		}
-		cout << endl;
+		cout << '\n' << endl;
 	} while (input != OPTION_LIM);
 
 	return 0;
