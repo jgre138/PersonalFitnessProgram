@@ -17,6 +17,7 @@ Changelog:
 - Update (10/28) : Added dynamic arrays to store fitness data. Resizing function to increase array sizewhen needed. Added calculation for change in BMI and total exercise time in history data.
 - Upadate (10/29) : Changed the method of storing data to creating a structure or "object" for each entry of fittness data. Changed from multiple arrays into one vector using the new structure as the type. Modified all other methods to reflect this change of array to vector.
 - Update (10/30) : Added a nested structure, with a user structure to hold basic info and the vector that holds their fitness records. Simplified the fuctions using the modifiers and acessors that the vector class has. Added new function to simplify the code for calulating BMI. Users can now see if they have a decrease or increase in their BMI.
+- Update (11/13) : Make some changes to to fix errors the program had with running
 
   Will add photos of the output in the future
 
